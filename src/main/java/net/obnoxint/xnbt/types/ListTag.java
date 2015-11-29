@@ -1,6 +1,7 @@
 package net.obnoxint.xnbt.types;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.obnoxint.xnbt.NBTTag;
@@ -45,6 +46,11 @@ public class ListTag extends AbstractListTag {
 
     public byte getContentType() {
         return isEmpty() ? 0 : getPayload().get(0).getHeader().getType();
+    }
+
+    @Override
+    public List<NBTTag> getPayload() {
+        return Collections.unmodifiableList(super.getPayload());
     }
 
 }
