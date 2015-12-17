@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.obnoxint.xnbt.BaseTag;
-import net.obnoxint.xnbt.NBTTag;
-import net.obnoxint.xnbt.NBTTagHeader;
 
 public abstract class AbstractCompoundTag extends BaseTag implements Map<String, NBTTag> {
 
@@ -24,7 +22,7 @@ public abstract class AbstractCompoundTag extends BaseTag implements Map<String,
     }
 
     protected AbstractCompoundTag(final String name, final Map<String, NBTTag> payload) {
-        super(new NBTTagHeader(BaseType.COMPOUND.Id(), name), sanitizePayload(payload));
+        super(new TagHeader(BaseType.COMPOUND.Id(), name), sanitizePayload(payload));
     }
 
     @Override
@@ -70,6 +68,11 @@ public abstract class AbstractCompoundTag extends BaseTag implements Map<String,
 
     public abstract NBTTag put(NBTTag tag);
 
+    /**
+     * <p>
+     * Use {@link #put(NBTTag)} instead.
+     * </p>
+     */
     @Override
     public final NBTTag put(final String key, final NBTTag value) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();

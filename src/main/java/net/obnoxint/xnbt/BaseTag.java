@@ -1,9 +1,8 @@
 package net.obnoxint.xnbt;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.obnoxint.xnbt.types.EndTag;
+import net.obnoxint.xnbt.types.NBTTag;
+import net.obnoxint.xnbt.types.TagHeader;
 
 /**
  * <p>
@@ -13,70 +12,11 @@ import net.obnoxint.xnbt.types.EndTag;
 public class BaseTag implements NBTTag {
 
     /**
-     * <p>
-     * Contains all base NBT types.
-     * </p>
-     */
-    public static enum BaseType {
-
-        END((byte) 0),
-        BYTE((byte) 1),
-        SHORT((byte) 2),
-        INTEGER((byte) 3),
-        LONG((byte) 4),
-        FLOAT((byte) 5),
-        DOUBLE((byte) 6),
-        BYTE_ARRAY((byte) 7),
-        STRING((byte) 8),
-        LIST((byte) 9),
-        COMPOUND((byte) 10),
-        INTEGER_ARRAY((byte) 11);
-
-        private static final Map<Byte, BaseType> idMap = new HashMap<>();
-
-        static {
-            for (final BaseType e : values()) {
-                idMap.put(e.id, e);
-            }
-        }
-
-        /**
-         * @param id
-         *            the id
-         * @return the BaseType of the given id
-         */
-        public static BaseType byId(final byte id) {
-            return idMap.get(id);
-        }
-
-        /**
-         * @return the highest id of all BaseTypes
-         */
-        public static int reservedIds() {
-            return idMap.size() - 1;
-        }
-
-        private final byte id;
-
-        private BaseType(final byte id) {
-            this.id = id;
-        }
-
-        /**
-         * @return the id
-         */
-        public byte Id() {
-            return id;
-        }
-
-    }
-
-    /**
      * No reason to instantiate an {@link EndTag} every time you need one.
      */
     public static final EndTag ENDTAG = new EndTag();
 
-    private final NBTTagHeader header;
+    private final TagHeader header;
 
     private Object payload;
 
@@ -90,12 +30,7 @@ public class BaseTag implements NBTTag {
      * @param payload
      *            the payload
      */
-    protected BaseTag(final NBTTagHeader header, final Object payload) {
-
-        if (header.getType() < 0) {
-            throw new IllegalArgumentException("illegal tag type: " + header.getType());
-        }
-
+    protected BaseTag(final TagHeader header, final Object payload) {
         this.header = header;
         this.payload = payload;
     }
@@ -123,7 +58,7 @@ public class BaseTag implements NBTTag {
     }
 
     @Override
-    public NBTTagHeader getHeader() {
+    public TagHeader getHeader() {
         return header;
     }
 
@@ -146,6 +81,13 @@ public class BaseTag implements NBTTag {
      */
     protected void setPayload(final Object payload) {
         this.payload = payload;
+    }
+
+    Class<?> getReturnType() {
+        try {
+            return getClass().getMethod("getPayload").getReturnType();
+        } catch (final Exception e) {}
+        return null;
     }
 
 }

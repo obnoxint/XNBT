@@ -1,16 +1,24 @@
 package net.obnoxint.xnbt.types;
 
 import net.obnoxint.xnbt.BaseTag;
-import net.obnoxint.xnbt.NBTTagHeader;
 
+/**
+ * <p>
+ * Contains a byte[].
+ * </p>
+ */
 public class ByteArrayTag extends BaseTag {
 
     private static byte[] sanitizePayload(final byte[] payload) {
         return payload == null ? new byte[0] : payload;
     }
 
+    public ByteArrayTag(final String name) {
+        this(name, null);
+    }
+
     public ByteArrayTag(final String name, final byte[] payload) {
-        super(new NBTTagHeader(BaseType.BYTE_ARRAY.Id(), name), sanitizePayload(payload));
+        super(new TagHeader(BaseType.BYTE_ARRAY.Id(), name), sanitizePayload(payload));
     }
 
     @Override

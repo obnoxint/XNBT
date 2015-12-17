@@ -1,12 +1,16 @@
 package net.obnoxint.xnbt.types;
 
 import net.obnoxint.xnbt.BaseTag;
-import net.obnoxint.xnbt.NBTTagHeader;
 
+/**
+ * <p>
+ * Used to finalize {@link CompoundTag}s and files in IO operations. Shouldn't be used programmatically.
+ * </p>
+ */
 public class EndTag extends BaseTag {
 
     public EndTag() {
-        super(new NBTTagHeader(BaseType.END.Id(), null), null);
+        super(new TagHeader(BaseType.END.Id(), null), null);
     }
 
     @Override

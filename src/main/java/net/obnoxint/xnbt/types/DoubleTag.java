@@ -1,12 +1,20 @@
 package net.obnoxint.xnbt.types;
 
 import net.obnoxint.xnbt.BaseTag;
-import net.obnoxint.xnbt.NBTTagHeader;
 
+/**
+ * <p>
+ * Contains a Double.
+ * </p>
+ */
 public class DoubleTag extends BaseTag {
 
+    public DoubleTag(final String name) {
+        this(name, 0D);
+    }
+
     public DoubleTag(final String name, final double payload) {
-        super(new NBTTagHeader(BaseType.DOUBLE.Id(), name), payload);
+        super(new TagHeader(BaseType.DOUBLE.Id(), name), payload);
     }
 
     @Override

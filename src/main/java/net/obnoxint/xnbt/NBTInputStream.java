@@ -2,9 +2,13 @@ package net.obnoxint.xnbt;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
-import net.obnoxint.xnbt.BaseTag.BaseType;
+import net.obnoxint.xnbt.XNBT.TagIOHandler;
+import net.obnoxint.xnbt.XNBT.TagPayloadReader;
 import net.obnoxint.xnbt.types.EndTag;
+import net.obnoxint.xnbt.types.NBTTag;
+import net.obnoxint.xnbt.types.NBTTag.BaseType;
 
 /**
  * <p>
@@ -22,7 +26,7 @@ public class NBTInputStream extends DataInputStream {
      * @param in
      *            the DataInputStream to read from
      */
-    public NBTInputStream(final DataInputStream in) {
+    public NBTInputStream(final InputStream in) {
         super(in);
     }
 
@@ -42,20 +46,7 @@ public class NBTInputStream extends DataInputStream {
             return new EndTag();
         }
 
-        final String name = readUTF();
-        Object payload = null;
-
-        if (type > BaseType.reservedIds()) {
-            final TagPayloadReader reader = XNBT.getReader(type);
-            if (reader == null) {
-                throw new IOException("no reader registered for type " + type);
-            }
-            payload = reader.read(this);
-        } else {
-            payload = BaseTagReader.getReader(type).read(this);
-        }
-
-        return XNBT.getBuilder(type).build(type, name, payload);
+        return XNBT.getBuilder(type).build(type, readUTF(), XNBT.getReader(type).read(this));
 
     }
 

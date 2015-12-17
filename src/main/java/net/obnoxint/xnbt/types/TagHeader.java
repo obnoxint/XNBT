@@ -1,14 +1,12 @@
-package net.obnoxint.xnbt;
+package net.obnoxint.xnbt.types;
 
 /**
  * <p>
- * The header of any {@link NBTTag}.
- * </p>
- * <p>
- * The header stores the immutable type id and name of an NBTTag.
+ * The TagHeader separates the immutable state description of the tag from the payload. It contains the type id and name
+ * of the tag it belongs to.
  * </p>
  */
-public class NBTTagHeader {
+public class TagHeader {
 
     private static final String NO_TAG_NAME = "";
 
@@ -25,7 +23,7 @@ public class NBTTagHeader {
      * @param name
      *            the name
      */
-    public NBTTagHeader(final byte type, final String name) {
+    public TagHeader(final byte type, final String name) {
         this.type = type;
         this.name = name == null ? NO_TAG_NAME : name;
     }
@@ -41,7 +39,7 @@ public class NBTTagHeader {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final NBTTagHeader other = (NBTTagHeader) obj;
+        final TagHeader other = (TagHeader) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;

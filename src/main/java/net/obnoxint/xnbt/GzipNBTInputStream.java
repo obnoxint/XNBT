@@ -1,13 +1,13 @@
 package net.obnoxint.xnbt;
 
-import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
 public class GzipNBTInputStream extends NBTInputStream {
 
-    public GzipNBTInputStream(final DataInputStream in) throws IOException {
-        super(new DataInputStream(new GZIPInputStream(in)));
+    public GzipNBTInputStream(final InputStream in) throws IOException {
+        super(new GZIPInputStream(in));
     }
 
 }

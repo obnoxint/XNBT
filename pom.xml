@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.obnoxint</groupId>
 	<artifactId>xnbt</artifactId>
-	<version>1.1.1</version>
+	<version>1.2.0</version>
 	<name>XNBT</name>
 
 	<build>
@@ -26,4 +26,13 @@
 		</pluginManagement>
 	</build>
 
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	
 </project>

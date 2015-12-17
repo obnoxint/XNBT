@@ -1,12 +1,20 @@
 package net.obnoxint.xnbt.types;
 
 import net.obnoxint.xnbt.BaseTag;
-import net.obnoxint.xnbt.NBTTagHeader;
 
+/**
+ * <p>
+ * Contains a Byte.
+ * </p>
+ */
 public class ByteTag extends BaseTag {
 
+    public ByteTag(final String name) {
+        this(name, (byte) 0);
+    }
+
     public ByteTag(final String name, final byte payload) {
-        super(new NBTTagHeader(BaseType.BYTE.Id(), name), payload);
+        super(new TagHeader(BaseType.BYTE.Id(), name), payload);
     }
 
     @Override

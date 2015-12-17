@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.obnoxint.xnbt.BaseTag;
-import net.obnoxint.xnbt.NBTTag;
-import net.obnoxint.xnbt.NBTTagHeader;
 
 public abstract class AbstractListTag extends BaseTag implements List<NBTTag> {
 
@@ -42,14 +40,24 @@ public abstract class AbstractListTag extends BaseTag implements List<NBTTag> {
     }
 
     protected AbstractListTag(final String name, final List<NBTTag> payload) {
-        super(new NBTTagHeader(BaseType.LIST.Id(), name), sanitizePayload(payload));
+        super(new TagHeader(BaseType.LIST.Id(), name), sanitizePayload(payload));
     }
 
+    /**
+     * <p>
+     * Use {@link #add(NBTTag)} instead.
+     * </p>
+     */
     @Override
     public final void add(final int index, final NBTTag element) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * <p>
+     * Use {@link #addAll(Collection)} instead.
+     * </p>
+     */
     @Override
     public final boolean addAll(final int index, final Collection<? extends NBTTag> c) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
@@ -131,6 +139,11 @@ public abstract class AbstractListTag extends BaseTag implements List<NBTTag> {
         return getPayload().retainAll(c);
     }
 
+    /**
+     * <p>
+     * Can not set specific element.
+     * </p>
+     */
     @Override
     public final NBTTag set(final int index, final NBTTag element) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();

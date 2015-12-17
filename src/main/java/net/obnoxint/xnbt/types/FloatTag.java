@@ -1,12 +1,21 @@
 package net.obnoxint.xnbt.types;
 
 import net.obnoxint.xnbt.BaseTag;
-import net.obnoxint.xnbt.NBTTagHeader;
+
+/**
+ * <p>
+ * Contains an Float.
+ * </p>
+ */
 
 public class FloatTag extends BaseTag {
 
+    public FloatTag(final String name) {
+        this(name, 0F);
+    }
+
     public FloatTag(final String name, final float payload) {
-        super(new NBTTagHeader(BaseType.FLOAT.Id(), name), payload);
+        super(new TagHeader(BaseType.FLOAT.Id(), name), payload);
     }
 
     @Override

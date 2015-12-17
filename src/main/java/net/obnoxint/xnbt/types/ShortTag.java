@@ -1,12 +1,20 @@
 package net.obnoxint.xnbt.types;
 
 import net.obnoxint.xnbt.BaseTag;
-import net.obnoxint.xnbt.NBTTagHeader;
 
+/**
+ * <p>
+ * Contains a Short.
+ * </p>
+ */
 public class ShortTag extends BaseTag {
 
+    public ShortTag(final String name) {
+        this(name, (short) 0);
+    }
+
     public ShortTag(final String name, final short payload) {
-        super(new NBTTagHeader(BaseType.SHORT.Id(), name), payload);
+        super(new TagHeader(BaseType.SHORT.Id(), name), payload);
     }
 
     @Override

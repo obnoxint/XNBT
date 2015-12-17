@@ -1,6 +1,5 @@
 package net.obnoxint.xnbt;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -9,39 +8,93 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.obnoxint.xnbt.BaseTag.BaseType;
+import net.obnoxint.xnbt.types.NBTTag;
+import net.obnoxint.xnbt.types.NBTTag.BaseType;
 
 public final class XNBT {
 
-    private static final Map<Byte, TagPayloadReader> extReaders = new HashMap<>();
-    private static final Map<Byte, TagBuilder> extBuilders = new HashMap<>();
-    private static final Map<Byte, TagPayloadWriter> extWriters = new HashMap<>();
+    public static interface TagBuilder {
 
-    public static List<NBTTag> readFromFile(final File file) throws IOException {
-        return readFromFile(file, true);
+        NBTTag build(byte type, String name, Object payload);
+
     }
 
-    public static List<NBTTag> readFromFile(final File file, final boolean isZipped) throws IOException {
-        try (FileInputStream is = new FileInputStream(file)) {
-            return readFromStream(is, isZipped);
+    public static interface TagIOHandler extends TagBuilder, TagPayloadReader, TagPayloadWriter {}
+
+    public static interface TagPayloadReader {
+
+        Object read(NBTInputStream in) throws IOException;
+
+    }
+
+    public static interface TagPayloadWriter {
+
+        void write(Object payload, NBTOutputStream out) throws IOException;
+
+    }
+
+    private static final Map<Byte, TagPayloadReader> readers = new HashMap<>();
+    private static final Map<Byte, TagBuilder> builders = new HashMap<>();
+    private static final Map<Byte, TagPayloadWriter> writers = new HashMap<>();
+
+    static {
+        for (byte i = 1; i < BaseTagIOHandler.getHandlers().length - 1; i++) {
+            registerType(i, BaseTagIOHandler.getHandlers()[i]);
+        }
+        registerType(BaseType.XNBT.Id(), BaseTagIOHandler.xnbtHandler);
+    }
+
+    public static void dump(final List<NBTTag> tags, final PrintStream out) throws Exception {
+        for (final NBTTag tag : tags) {
+            dump(0, tag, null, out);
         }
     }
 
-    public static List<NBTTag> readFromStream(final InputStream is) throws IOException {
-        return readFromStream(is, true);
+    public static TagBuilder getBuilder(final byte type) {
+        return builders.get(type);
     }
 
-    public static List<NBTTag> readFromStream(final InputStream is, final boolean isZipped) throws IOException {
+    public static TagPayloadReader getReader(final byte type) {
+        return readers.get(type);
+    }
+
+    public static TagPayloadWriter getWriter(final byte type) {
+        return writers.get(type);
+    }
+
+    public static List<NBTTag> loadTags(final File file) throws IOException {
+        return loadTags(file, true);
+    }
+
+    public static List<NBTTag> loadTags(final File file, final boolean isZipped) throws IOException {
+        try (FileInputStream is = new FileInputStream(file)) {
+            return readTags(is, isZipped);
+        }
+    }
+
+    public static List<NBTTag> readTags(final InputStream is) throws IOException {
+        return readTags(is, true);
+    }
+
+    public static List<NBTTag> readTags(final InputStream is, final boolean isZipped) throws IOException {
+
+        if (is == null) {
+            throw new IllegalArgumentException("is must not be null");
+        }
+
         final List<NBTTag> r = new ArrayList<>();
 
         try (NBTInputStream in = isZipped
-                ? new GzipNBTInputStream(new DataInputStream(is))
-                : new NBTInputStream(new DataInputStream(is))) {
+                ? new GzipNBTInputStream(is)
+                : new NBTInputStream(is)) {
             while (true) {
                 final NBTTag tag = in.readTag();
                 if (tag.equals(BaseTag.ENDTAG)) {
@@ -61,12 +114,8 @@ public final class XNBT {
     public static void registerType(final byte type, final TagPayloadReader reader, final TagBuilder builder,
             final TagPayloadWriter writer) {
 
-        if (extReaders.containsKey(type)) {
+        if (readers.containsKey(type)) {
             throw new IllegalArgumentException("type already registered: " + type);
-        }
-
-        if (type <= BaseType.reservedIds()) {
-            throw new IllegalArgumentException("illegal type: " + type);
         }
 
         if (reader == null) {
@@ -81,31 +130,33 @@ public final class XNBT {
             throw new IllegalArgumentException("writer must not be null");
         }
 
-        extReaders.put(type, reader);
-        extWriters.put(type, writer);
+        readers.put(type, reader);
+        builders.put(type, builder);
+        writers.put(type, writer);
 
     }
 
-    public static void unregisterType(final byte type) {
-        extReaders.remove(type);
-        extWriters.remove(type);
+    public static void saveTags(final List<NBTTag> tags, final File file) throws IOException {
+        saveTags(tags, file, true);
     }
 
-    public static void writeToFile(final List<NBTTag> tags, final File file) throws IOException {
-        writeToFile(tags, file, true);
-    }
-
-    public static void writeToFile(final List<NBTTag> tags, final File file, final boolean zip) throws IOException {
+    public static void saveTags(final List<NBTTag> tags, final File file, final boolean zip) throws IOException {
         try (FileOutputStream os = new FileOutputStream(file)) {
-            writeToStream(tags, os, zip);
+            writeTags(tags, os, zip);
         }
     }
 
-    public static void writeToStream(final List<NBTTag> tags, final OutputStream os) throws IOException {
-        writeToStream(tags, os, true);
+    public static void unregisterType(final byte type) {
+        readers.remove(type);
+        builders.remove(type);
+        writers.remove(type);
     }
 
-    public static void writeToStream(final List<NBTTag> tags, final OutputStream os, final boolean zip)
+    public static void writeTags(final List<NBTTag> tags, final OutputStream os) throws IOException {
+        writeTags(tags, os, true);
+    }
+
+    public static void writeTags(final List<NBTTag> tags, final OutputStream os, final boolean zip)
             throws IOException {
 
         if (tags == null) {
@@ -134,21 +185,124 @@ public final class XNBT {
             for (final NBTTag t : tags) {
                 out.writeTag(t);
             }
-            // out.writeTag(BaseTag.ENDTAG);
         }
 
     }
 
-    static TagBuilder getBuilder(final byte type) {
-        return type <= BaseType.reservedIds() ? BaseTagBuilder.getBuilder(type) : extBuilders.get(type);
+    static void dump(final int depth, final NBTTag tag, StringBuilder sb, final PrintStream out) throws Exception {
+
+        if (sb == null) {
+            sb = new StringBuilder();
+        }
+
+        sb.append(indent(depth));
+
+        final byte type = tag.getHeader().getType();
+        final String name = tag.getHeader().getName();
+        final Object payload = tag.getPayload();
+
+        // type
+        sb.append(type).append(" ")
+
+                // type descriptor
+                .append((type < BaseType.values().length) ? BaseType.byId(type).name() : getBuilder(type).getClass().getName()).append(" ")
+
+                // name
+                .append(name.isEmpty() ? "(untitled)" : name).append(" ");
+
+        // payload
+        if (type < BaseType.values().length) {
+
+            switch (BaseType.byId(type)) {
+
+            case XNBT:
+                final Object o = tag.getPayload();
+                if (!o.getClass().isAnnotationPresent(Tag.class)) {
+                    break;
+                } else {
+                    sb.append(o.getClass().getName()).append(" ")
+                            .append("\"").append(o.getClass().getAnnotation(Tag.class).name()).append("\"");
+                }
+                for (final Field f : o.getClass().getDeclaredFields()) {
+                    if (f.isAnnotationPresent(Tag.class)) {
+                        f.setAccessible(true);
+                        sb.append("\n").append(indent(depth + 1))
+                                .append(f.getName()).append(" ")
+                                .append(f.getType().getName()).append(" ")
+                                .append("\"").append(f.getAnnotation(Tag.class).name()).append("\" ")
+                                .append(f.get(o));
+                        f.setAccessible(false);
+                    }
+                }
+                break;
+            case END:
+                sb.append("\n");
+                break;
+
+            case BYTE_ARRAY:
+                sb.append(Arrays.toString((byte[]) payload)).append("\n");
+                break;
+
+            case INTEGER_ARRAY:
+                sb.append(Arrays.toString((int[]) payload)).append("\n");
+                break;
+
+            case COMPOUND:
+                @SuppressWarnings("unchecked")
+                final Map<String, NBTTag> _c = (Map<String, NBTTag>) payload;
+                sb.append(_c.size()).append(" values");
+
+                if (!_c.isEmpty()) {
+                    sb.append("\n");
+                    for (final NBTTag e : _c.values()) {
+                        dump(depth + 1, e, sb, null);
+                    }
+                }
+                break;
+
+            case LIST:
+                @SuppressWarnings("unchecked")
+                final List<NBTTag> _l = (List<NBTTag>) payload;
+                sb.append(_l.size()).append(" values");
+                if (!_l.isEmpty()) {
+                    sb.append("\n");
+                    for (final NBTTag e : _l) {
+                        dump(depth + 1, e, sb, null);
+                    }
+                }
+                break;
+
+            case STRING:
+                final String s = (String) payload;
+                sb.append(s.isEmpty() ? "(empty string)" : s).append("\n");
+                break;
+
+            default:
+                sb.append(payload).append("\n");
+                break;
+            }
+
+        } else {
+            sb.append(payload.toString()).append("\n");
+        }
+
+        if (depth == 0) {
+            out.println(sb.toString());
+        }
+
     }
 
-    static TagPayloadReader getReader(final byte type) {
-        return type <= BaseType.reservedIds() ? BaseTagReader.getReader(type) : extReaders.get(type);
+    static Map<Byte, TagBuilder> getBuilders() {
+        return builders;
     }
 
-    static TagPayloadWriter getWriter(final byte type) {
-        return type <= BaseType.reservedIds() ? BaseTagWriter.getWriter(type) : extWriters.get(type);
+    private static String indent(final int depth) {
+        final int off = depth * 3;
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < off; i++) {
+            sb.append(" ");
+        }
+        return sb.toString();
     }
 
     private XNBT() {}

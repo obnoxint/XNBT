@@ -1,16 +1,24 @@
 package net.obnoxint.xnbt.types;
 
 import net.obnoxint.xnbt.BaseTag;
-import net.obnoxint.xnbt.NBTTagHeader;
 
+/**
+ * <p>
+ * Contains a String.
+ * </p>
+ */
 public class StringTag extends BaseTag {
 
     private static String sanitizePayload(final String payload) {
         return payload == null ? "" : payload;
     }
 
+    public StringTag(final String name) {
+        this(name, null);
+    }
+
     public StringTag(final String name, final String payload) {
-        super(new NBTTagHeader(BaseType.STRING.Id(), name), sanitizePayload(payload));
+        super(new TagHeader(BaseType.STRING.Id(), name), sanitizePayload(payload));
     }
 
     @Override

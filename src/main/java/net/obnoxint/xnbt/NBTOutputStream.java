@@ -2,8 +2,12 @@ package net.obnoxint.xnbt;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
-import net.obnoxint.xnbt.BaseTag.BaseType;
+import net.obnoxint.xnbt.XNBT.TagIOHandler;
+import net.obnoxint.xnbt.XNBT.TagPayloadWriter;
+import net.obnoxint.xnbt.types.NBTTag;
+import net.obnoxint.xnbt.types.NBTTag.BaseType;
 
 /**
  * <p>
@@ -21,7 +25,7 @@ public class NBTOutputStream extends DataOutputStream {
      * @param out
      *            the DataOutputStream to write to
      */
-    public NBTOutputStream(final DataOutputStream out) {
+    public NBTOutputStream(final OutputStream out) {
         super(out);
     }
 
@@ -49,21 +53,14 @@ public class NBTOutputStream extends DataOutputStream {
             return;
         }
 
-        writeUTF(tag.getHeader().getName());
-
-        if (type > BaseType.reservedIds()) {
-            final TagPayloadWriter writer = XNBT.getWriter(type);
-            if (writer == null) {
-                throw new IOException("no writer registered for type " + type);
-            }
-            writer.write(tag.getPayload(), this);
-        } else {
-            if (tag.getPayload() == null) {
-                throw new IOException(new StringBuilder()
-                        .append("null payload in tag ").append(tag.getHeader().getName())
-                        .append(" (").append(BaseType.byId(type).name()).append(")").toString());
-            }
-            BaseTagWriter.getWriter(type).write(tag.getPayload(), this);
+        if (type < BaseType.values().length && tag.getPayload() == null) {
+            throw new IOException(new StringBuilder()
+                    .append("null payload in base tag ").append(tag.getHeader().getName())
+                    .append(" (").append(BaseType.byId(type).name()).append(")").toString());
         }
+
+        writeUTF(tag.getHeader().getName());
+        XNBT.getWriter(type).write(tag.getPayload(), this);
+
     }
 }

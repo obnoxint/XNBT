@@ -4,9 +4,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.obnoxint.xnbt.NBTTag;
-
+/**
+ * <p>
+ * Contains a list of a single type of NBTTags.
+ * </p>
+ */
 public class ListTag extends AbstractListTag {
+
+    public ListTag(final String name) {
+        this(name, null);
+    }
 
     public ListTag(final String name, final List<NBTTag> payload) {
         super(name, payload);
@@ -28,7 +35,7 @@ public class ListTag extends AbstractListTag {
                     + getPayload().get(0).getHeader().getType());
         }
 
-        return getPayload().add(e);
+        return super.getPayload().add(e);
     }
 
     @Override

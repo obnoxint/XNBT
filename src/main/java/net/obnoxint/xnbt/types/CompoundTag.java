@@ -4,9 +4,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import net.obnoxint.xnbt.NBTTag;
-
+/**
+ * <p>
+ * Contains a map of NBTTags. Uses the names of its values as keys.
+ * </p>
+ */
 public class CompoundTag extends AbstractCompoundTag {
+
+    public CompoundTag(final String name) {
+        this(name, null);
+    }
 
     public CompoundTag(final String name, final Map<String, NBTTag> payload) {
         super(name, payload);
@@ -18,11 +25,11 @@ public class CompoundTag extends AbstractCompoundTag {
     }
 
     @Override
-    public NBTTag put(final NBTTag value) {
-        if (value == null) {
+    public NBTTag put(final NBTTag tag) {
+        if (tag == null) {
             throw new NullPointerException();
         }
-        return getPayload().put(value.getHeader().getName(), value);
+        return super.getPayload().put(tag.getHeader().getName(), tag);
     }
 
     @Override

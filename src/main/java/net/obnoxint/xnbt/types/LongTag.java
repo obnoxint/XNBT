@@ -1,12 +1,20 @@
 package net.obnoxint.xnbt.types;
 
 import net.obnoxint.xnbt.BaseTag;
-import net.obnoxint.xnbt.NBTTagHeader;
 
+/**
+ * <p>
+ * Contains a Long.
+ * </p>
+ */
 public class LongTag extends BaseTag {
 
+    public LongTag(final String name) {
+        this(name, 0L);
+    }
+
     public LongTag(final String name, final long payload) {
-        super(new NBTTagHeader(BaseType.LONG.Id(), name), payload);
+        super(new TagHeader(BaseType.LONG.Id(), name), payload);
     }
 
     @Override
