@@ -127,7 +127,7 @@ public @interface Tag {
      * The name of the class or field. If this value is omitted, the simple name of the class or the name of the field
      * will be used.
      * </p>
-     * 
+     *
      * @return the name
      */
     String name() default "";
@@ -135,7 +135,7 @@ public @interface Tag {
     /**
      * <p>
      * </p>
-     * 
+     *
      * @return the type
      */
     byte type() default AUTO;

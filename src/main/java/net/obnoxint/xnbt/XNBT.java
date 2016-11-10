@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.obnoxint.xnbt.types.EndTag;
 import net.obnoxint.xnbt.types.NBTTag;
 import net.obnoxint.xnbt.types.NBTTag.BaseType;
 
@@ -97,7 +98,7 @@ public final class XNBT {
                 : new NBTInputStream(is)) {
             while (true) {
                 final NBTTag tag = in.readTag();
-                if (tag.equals(BaseTag.ENDTAG)) {
+                if (tag.equals(EndTag.INSTANCE)) {
                     break;
                 }
                 r.add(tag);
@@ -175,7 +176,7 @@ public final class XNBT {
             throw new IllegalArgumentException("tags must not contain null elements");
         }
 
-        if (tags.contains(BaseTag.ENDTAG)) {
+        if (tags.contains(EndTag.INSTANCE)) {
             throw new IllegalArgumentException("tags must not contain end tags");
         }
 

@@ -7,17 +7,22 @@ import net.obnoxint.xnbt.BaseTag;
  * Used to finalize {@link CompoundTag}s and files in IO operations. Shouldn't be used programmatically.
  * </p>
  */
-public class EndTag extends BaseTag {
+public final class EndTag extends BaseTag {
 
-    public EndTag() {
+    /**
+     * No reason to instantiate an {@link EndTag} every time you need one.
+     */
+    public static final EndTag INSTANCE = new EndTag();
+
+    private EndTag() {
         super(new TagHeader(BaseType.END.Id(), null), null);
     }
 
     @Override
-    public String getPayload() {
+    public Object getPayload() {
         return null;
     }
 
-    public void setPayload(final String payload) {}
+    public void setPayload(final Object payload) {}
 
 }

@@ -43,7 +43,7 @@ public class NBTInputStream extends DataInputStream {
         final byte type = readByte();
 
         if (type == BaseType.END.Id()) {
-            return new EndTag();
+            return EndTag.INSTANCE;
         }
 
         return XNBT.getBuilder(type).build(type, readUTF(), XNBT.getReader(type).read(this));

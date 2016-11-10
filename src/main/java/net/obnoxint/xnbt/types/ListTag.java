@@ -25,7 +25,7 @@ public class ListTag extends AbstractListTag {
             throw new NullPointerException();
         }
 
-        if (e.equals(ENDTAG)) {
+        if (e.equals(EndTag.INSTANCE)) {
             throw new IllegalArgumentException("ListTag may not contain EndTags");
         }
 

@@ -1,6 +1,5 @@
 package net.obnoxint.xnbt;
 
-import net.obnoxint.xnbt.types.EndTag;
 import net.obnoxint.xnbt.types.NBTTag;
 import net.obnoxint.xnbt.types.TagHeader;
 
@@ -10,11 +9,6 @@ import net.obnoxint.xnbt.types.TagHeader;
  * </p>
  */
 public class BaseTag implements NBTTag {
-
-    /**
-     * No reason to instantiate an {@link EndTag} every time you need one.
-     */
-    public static final EndTag ENDTAG = new EndTag();
 
     private final TagHeader header;
 

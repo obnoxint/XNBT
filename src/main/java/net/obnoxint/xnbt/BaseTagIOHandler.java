@@ -13,6 +13,7 @@ import net.obnoxint.xnbt.types.ByteArrayTag;
 import net.obnoxint.xnbt.types.ByteTag;
 import net.obnoxint.xnbt.types.CompoundTag;
 import net.obnoxint.xnbt.types.DoubleTag;
+import net.obnoxint.xnbt.types.EndTag;
 import net.obnoxint.xnbt.types.FloatTag;
 import net.obnoxint.xnbt.types.IntegerArrayTag;
 import net.obnoxint.xnbt.types.IntegerTag;
@@ -505,7 +506,7 @@ abstract class BaseTagIOHandler implements TagIOHandler {
 
                 while (true) {
                     final NBTTag t = in.readTag();
-                    if (t.equals(BaseTag.ENDTAG)) {
+                    if (t.equals(EndTag.INSTANCE)) {
                         break;
                     }
                     r.put(t.getHeader().getName(), t);
@@ -520,7 +521,7 @@ abstract class BaseTagIOHandler implements TagIOHandler {
                 for (final NBTTag t : ((Map<String, NBTTag>) payload).values()) {
                     out.writeTag(t);
                 }
-                out.writeTag(BaseTag.ENDTAG);
+                out.writeTag(EndTag.INSTANCE);
             }
 
         };
