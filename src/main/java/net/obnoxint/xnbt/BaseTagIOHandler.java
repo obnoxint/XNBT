@@ -77,9 +77,9 @@ abstract class BaseTagIOHandler implements TagIOHandler {
                 try {
                     field.set(r, tagToObject(document.get(fieldName), field.getClass()));
                 } catch (IllegalArgumentException | IllegalAccessException e) {
-                    throw new IOException(e);
+                    throw new IOException("failed to set XNBT payload element " + field.getName(), e);
                 }
-                field.setAccessible(false);;
+                field.setAccessible(false);
 
             }
 
